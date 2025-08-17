@@ -1,0 +1,96 @@
+/**
+ * SPDX-FileCopyrightText: 2025 Markus Lohse <mlohse@gmx.net>
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#include "gpio/gpio.h"
+#include <QSerialPort>
+
+// application info
+const char APP_NAME[]                         = "${PROJECT_NAME}";
+const char ORG_NAME[]                         = "mlohse";
+const char ORG_DOMAIN[]                       = "";
+
+const char VERSION[] = "${CMAKE_PROJECT_VERSION}";
+const unsigned int BUILD_TIMESTAMP            = ${BUILD_DATE};
+
+const char VERSION_INFO[]                     = "Fanet Ground Station Daemon\n version %1.%2.%3 (build on %4)\n"
+                                                "Copyright (C) 2025 by Markus Lohse <mlohse@gmx.net>";
+const char PID_FILE[]                         = "/run/${PROJECT_NAME}.pid";
+
+// Xml element/attribute names for config parser
+const char CONFIG_ELEMENT_FAGS[]              = "fags";
+const char CONFIG_ELEMENT_RADIO[]             = "radio";
+const char CONFIG_ELEMENT_FANET[]             = "fanet";
+const char CONFIG_ELEMENT_STATIONS[]          = "stations";
+const char CONFIG_ELEMENT_HOLFUYAPI[]         = "holfuyapi";
+const char CONFIG_ELEMENT_HOLFUYWIDGET[]      = "holfuywidget";
+const char CONFIG_ELEMENT_WINDBIRD[]          = "windbird";
+const char CONFIG_ATTR_VERSION[]              = "config_version";
+const char CONFIG_ATTR_UART[]                 = "uart";
+const char CONFIG_ATTR_FREQ[]                 = "frequency";
+const char CONFIG_ATTR_TXPOWER[]              = "txpower";
+const char CONFIG_ATTR_PINBOOT[]              = "pin_boot";
+const char CONFIG_ATTR_PINRESET[]             = "pin_reset";
+const char CONFIG_ATTR_ID[]                   = "id";
+const char CONFIG_ATTR_NAME[]                 = "name";
+const char CONFIG_ATTR_APIKEY[]               = "apikey";
+const char CONFIG_ATTR_POSLON[]               = "pos_longitude";
+const char CONFIG_ATTR_POSLAT[]               = "pos_latitude";
+const char CONFIG_ATTR_POSALT[]               = "pos_altitude";
+const char CONFIG_ATTR_IVAL[]                 = "update_interval";
+const char CONFIG_ATTR_TXINTERVAL_WEATHER[]   = "txinterval_weather";
+const char CONFIG_ATTR_TXINTERVAL_NAMES[]     = "txinterval_names";
+const char CONFIG_ATTR_INACTIVITY_TIMEOUT[]   = "inactivity_timeout";
+const char CONFIG_ATTR_WEATHER_MAXAGE[]       = "weather_data_maxage";
+
+// config version
+const int CONFIG_VER_MAJOR = 1; // must match loaded config version
+const int CONFIG_VER_MINOR = 0; // must be smaller or equal to loaded config's minor
+
+// FANET Module uart settings: 115200Baud 8N1, no flow control
+const QSerialPort::BaudRate    FANET_BAUDRATE = QSerialPort::Baud115200;
+const QSerialPort::DataBits    FANET_DATABITS = QSerialPort::Data8;
+const QSerialPort::Parity      FANET_PARITY   = QSerialPort::NoParity;
+const QSerialPort::StopBits    FANET_STOPBITS = QSerialPort::OneStop;
+const QSerialPort::FlowControl FANET_FLOWTYPE = QSerialPort::NoFlowControl;
+
+
+#define FANET_MSG_DEBUG
+const char FANET_DEV_DEFAULT[]                = "/dev/ttyUSB0";
+const int  FANET_FREQ_DEFAULT                 = 868;  // must be 868MHz or 915MHz
+const int  FANET_TXPOWER_DEFAULT              = 11;   // default tx power (without antenna gain taken into consideration)
+const int  FANET_TXPOWER_MIN                  = 2;    // min/max values taken from FANET+ Module datasheet
+const int  FANET_TXPOWER_MAX                  = 20;
+const int  FANET_TXINTERVAL_WEATHER_DEFAULT   = 40;   // send weather data every 40 seconds
+const int  FANET_TXINTERVAL_NAMES_DEFAULT     = 300;  // send station name(s) every 5min.
+const int  FANET_INACTIVITY_TIMEOUT_DEFAULT   = 3600; // if no other nodes are seen for more than 1 hour - stop broadcasting weather data
+const int  FANET_WEATHER_DATA_MAXAGE          = 300;  // if weather data is older than 5min. do not broadcast via fanet
+
+#if defined RPI_GPIO
+// Default Radio IO settings on Raspberry Pi
+const bool FANET_PIN_INVERT_BOOT              = false;
+const bool FANET_PIN_INVERT_RESET             = false;
+const Gpio::GpioPin FANET_PIN_BOOT            = Gpio::PinRpi13;
+const Gpio::GpioPin FANET_PIN_RESET           = Gpio::PinRpi15;
+#else
+// Default Radio IO for debugging on desktop PC
+const bool FANET_PIN_INVERT_BOOT              = true;
+const bool FANET_PIN_INVERT_RESET             = true;
+const Gpio::GpioPin FANET_PIN_BOOT            = Gpio::PinUartRTS;
+const Gpio::GpioPin FANET_PIN_RESET           = Gpio::PinUartDTR;
+#endif
+
+// LEDs (accessible via Raspi GPIO only)
+const Gpio::GpioPin LED_PIN_RED               = Gpio::PinRpi31;
+const Gpio::GpioPin LED_PIN_GREEN             = Gpio::PinRpi29;
+const Gpio::GpioPin LED_PIN_BLUE              = Gpio::PinRpi32;
+
+// logger
+const int LOGGER_EXIT_CODE_CRITICAL           = 2; // application exit code on critical log message
+
+#endif // CONFIG_H

@@ -1,0 +1,17 @@
+[Unit]
+Description=Fanet Ground Station daemon
+Requires=dbus.service
+After=syslog.target network-online.target dbus.service
+
+[Service]
+Type=forking
+RemainAfterExit=false
+PIDFile=/run/fagsd.pid
+ExecStart=/usr/bin/fagsd -d -c /etc/fagsd.conf
+ExecStop=/usr/bin/fagsd -q
+StandardOutput=null
+Restart=on-abnormal
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

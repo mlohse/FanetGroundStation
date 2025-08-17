@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Example config file for Fanet Ground Station
+
+    Author: Markus Lohse <mlohse@gmx.net>
+    Date:   2025-08-17
+-->
+<fags config_version="1.0">
+	<!--
+	    General fanet settings:
+	        * txinterval_weather:  Transmit interval (in seconds) for broadcasting weather data (default: 40seconds).
+	        * txinterval_names:    Transmit interval (in seconds) for sending station name (default: 600seconds).
+	        * inactivity_timeout:  Timeout in seconds to stop broadcasting weather data after last node was seen sending tracking info (= no pilots in the air).
+	                               This also stopps polling weather data from the internet. Set to '0' to continously broadcast data regardless of flight activity.
+	        * weather_data_maxage: Maximum age in seconds for weather data to be broadcasted via fanet. Default: 300seconds
+	-->
+	<fanet txinterval_weather="40" txinterval_names="600" inactivity_timeout="3600" weather_data_maxage="300" />
+	<!--
+	    Fanet Radio settings:
+	        * txpower: Transmit Power in dBm (not taking antenna gain into consideration), value range: 2..20, default: 11
+	                   Example: If you want 20dBm using a +3dBm Antenna (see datasheet of your antenna!), set to '17'
+	        * frequency: Frequency: 868MHz (Europe) or 915MHz (US - may not be supported by the radio yet), default: 868
+	        * uart:      Uart device connected to the fanet radio
+	        * pin_boot:  GPIO pin connected to boot, if pin needs to be inverted, prefix with '!'
+	        * pin_reset: GPIO pin connected to reset, if pin needs to be inverted, prefix with '!'
+	-->
+	<radio txpower="11" frequency="868" uart="/dev/ttyUSB0" pin_boot="!RTS" pin_reset="!DTR" /><!-- USB (debugging) -->
+	<!--<radio txpower="11" frequency="868" uart="/dev/ttyAMA0" pin_boot="RpiJ8Pin13" pin_reset="RpiJ8Pin15" />--><!-- Rasperri Pi Zero2 -->
+	
+	<stations>
+		<!--
+		    Stations:
+		    Currently only Holfuy and Windbird stations are supported. The preferred way to query Holfuy stations is via API.
+		    For API access you need to ask for a key (please contact Holfuy). For testing (or when you do not have such key) fagsd can try
+		    to parse the html of a holfuy widget - of course, this will generate more internet traffic and may break at any time.
+		    Windbird's API does not require a key, but its license requires the following message to be shown (which is rather difficult
+		    to do for an application running as a background service) therefore I'm doing it here and in syslog):
+		        "Wind data (c) contributors of the OpenWindMap wind network <https://openwindmap.org>"
+
+		    * id:              Holfuy/Windbird station id
+		    * name:            station name, as sent via fanet (doesn't need to match the station's name on the internet)
+		    * apikey:          API key for holfuy api access, optional
+		    * pos_latitude:    position (latitude) in decimal format, as sent via fanet
+		    * pos_longitude:   position (longitude) in decimal format, as be sent via fanet
+		    * pos_altitude:    position (altitude) - currently not in use
+		    * update_interval: polling interval in seconds for querying the station (must not be <100 for Windbird!)
+		-->
+		<holfuyapi id="101" name="TestStation" apikey="pass" pos_latitude="47.562242" pos_longitude="19.013683" pos_altitude="225" update_interval="60" />
+	<!--<holfuywidget id="773" name="Kreuzeck" pos_latitude="47.45274" pos_longitude="11.06951" pos_altitude="1650" update_interval="100" />-->
+	<!--<windbird id="1348" name="LP Friedhof" pos_latitude="47.506402" pos_longitude="11.100941" pos_altitude="690" update_interval="100" />-->
+	</stations>
+</fags>
