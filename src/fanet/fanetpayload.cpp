@@ -646,6 +646,8 @@ QString FanetPayload::deviceFromId(quint8 manufacturerId, quint8 deviceId)
 			}
 		case 0x20:
 			return "XC Tracer";
+		case 0xBA:
+			return "Burnair";
 		case 0xCB:
 			return "Cloudbuddy";
 		case 0xDD:
